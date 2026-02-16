@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Schema Flow - Visual JSON to JSON Schema Converter</title>
+    <meta name="description" content="Convert JSON to JSON Schema with visual tree editor. Supports draft-07, 2019-09, 2020-12.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tree-item { transition: all 0.15s ease; }
+        .tree-item:hover { background: rgba(59, 130, 246, 0.1); }
+        .tree-line { border-left: 2px dashed #e5e7eb; margin-left: 12px; }
+        .fade-in { animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .drag-over { border: 2px dashed #3b82f6 !important; background: rgba(59, 130, 246, 0.05); }
+        textarea { font-family: 'Monaco', 'Menlo', monospace; }
+        .schema-preview { font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Header -->
+        <header class="mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">JSON Schema Flow</h1>
+                    <p class="text-gray-500 text-sm mt-1">Visual JSON to JSON Schema Converter</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <select id="schemaVersion" class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="2020-12">JSON Schema 2020-12</option>
+                        <option value="2019-09" selected>JSON Schema 2019-09</option>
+                        <option value="draft-07">Draft-07</option>
+                        <option value="draft-04">Draft-04</option>
+                    </select>
+                    <button onclick="copySchema()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        Copy Schema
+                    </button>
+                    <button onclick="copyTypeScript()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        Copy TypeScript
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left Panel - JSON Input -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+                    <h2 class="font-semibold text-gray-700 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+                        JSON Input
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <button onclick="loadSample()" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Load Sample</button>
+                        <span class="text-gray-300">|</span>
+                        <button onclick="clearInput()" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <textarea
+                        id="jsonInput"
+                        class="w-full h-64 p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        placeholder="Paste your JSON here..."
+                        oninput="convertJson()"
+                    ></textarea>
+                    <div id="errorMsg" class="mt-2 text-sm text-red-600 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Visual Tree -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                    <h2 class="font-semibold text-gray-700 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                        Schema Structure
+                    </h2>
+                </div>
+                <div id="treeView" class="p-4 h-64 overflow-auto">
+                    <div class="text-gray-400 text-sm text-center py-8">
+                        Paste JSON to see the schema structure
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Panel - Schema Output -->
+        <div class="mt-6 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+                <h2 class="font-semibold text-gray-700 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    JSON Schema Output
+                </h2>
+                <div class="flex items-center gap-3">
+                    <label class="flex items-center gap-2 text-sm text-gray-600">
+                        <input type="checkbox" id="includeRefs" checked onchange="convertJson()" class="rounded border-gray-300">
+                        Use $ref for reuse
+                    </label>
+                    <label class="flex items-center gap-2 text-sm text-gray-600">
+                        <input type="checkbox" id="includeExamples" checked onchange="convertJson()" class="rounded border-gray-300">
+                        Include examples
+                    </label>
+                </div>
+            </div>
+            <div class="p-4">
+                <pre id="schemaOutput" class="schema-preview bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto h-48 overflow-y-auto">{}</pre>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-sm text-gray-500">
+            <p>Open Source • MIT License • <a href="https://github.com/ozxc44/json-schema-flow" class="text-blue-600 hover:underline">GitHub</a></p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        Copied to clipboard!
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
