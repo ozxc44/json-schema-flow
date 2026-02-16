@@ -32,6 +32,118 @@ const SAMPLE_JSON = {
     "version": 1.0
 };
 
+// Programmatic SEO - Pre-built templates for common use cases
+const TEMPLATES = {
+    user: {
+        title: "User Profile Schema",
+        description: "Common user profile JSON schema with authentication data",
+        example: {
+            "id": "usr_abc123",
+            "username": "johndoe",
+            "email": "john@example.com",
+            "avatar": "https://example.com/avatar.jpg",
+            "role": "developer",
+            "isActive": true,
+            "createdAt": "2024-01-15T10:30:00Z",
+            "settings": {
+                "theme": "dark",
+                "notifications": true,
+                "language": "en"
+            }
+        }
+    },
+    api: {
+        title: "API Response Schema",
+        description: "RESTful API response with pagination",
+        example: {
+            "success": true,
+            "message": "Data retrieved successfully",
+            "data": [
+                {
+                    "id": 1,
+                    "title": "Example Post",
+                    "content": "Post content here",
+                    "author": {
+                        "id": 123,
+                        "name": "John Doe"
+                    },
+                    "tags": ["javascript", "api"],
+                    "published": true
+                }
+            ],
+            "pagination": {
+                "page": 1,
+                "limit": 20,
+                "total": 150,
+                "totalPages": 8
+            }
+        }
+    },
+    ecommerce: {
+        title: "E-commerce Product Schema",
+        description: "Product catalog schema for online stores",
+        example: {
+            "id": "prod_xyz789",
+            "name": "Wireless Bluetooth Headphones",
+            "description": "High-quality audio with noise cancellation",
+            "price": 79.99,
+            "currency": "USD",
+            "sku": "WBH-001",
+            "stock": 250,
+            "categories": ["electronics", "audio", "accessories"],
+            "images": [
+                "https://example.com/product1.jpg",
+                "https://example.com/product2.jpg"
+            ],
+            "variants": [
+                {
+                    "color": "Black",
+                    "price": 79.99
+                },
+                {
+                    "color": "White",
+                    "price": 79.99
+                }
+            ],
+            "reviews": {
+                "average": 4.5,
+                "count": 342
+            },
+            "isActive": true
+        }
+    },
+    config: {
+        title: "Application Configuration Schema",
+        description: "Config file schema for applications",
+        example: {
+            "appName": "MyApplication",
+            "version": "1.0.0",
+            "environment": "production",
+            "debug": false,
+            "server": {
+                "host": "0.0.0.0",
+                "port": 3000,
+                "ssl": true
+            },
+            "database": {
+                "host": "localhost",
+                "port": 5432,
+                "name": "myapp_db",
+                "poolSize": 10
+            },
+            "features": {
+                "analytics": true,
+                "notifications": true,
+                "betaFeatures": false
+            },
+            "logging": {
+                "level": "info",
+                "format": "json"
+            }
+        }
+    }
+};
+
 // Schema version configurations
 const SCHEMA_VERSIONS = {
     '2020-12': 'https://json-schema.org/draft/2020-12/schema',
@@ -374,9 +486,27 @@ function loadSample() {
     convertJson();
 }
 
+function loadTemplate(templateName) {
+    const template = TEMPLATES[templateName];
+    if (template) {
+        document.getElementById('jsonInput').value = JSON.stringify(template.example, null, 2);
+        convertJson();
+        // Update page title for SEO
+        if (template.title) {
+            document.title = `${template.title} - JSON Schema Flow`;
+        }
+    }
+}
+
 function clearInput() {
     document.getElementById('jsonInput').value = '';
     convertJson();
+}
+
+// Get URL parameter
+function getUrlParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
 }
 
 function copySchema() {
@@ -404,6 +534,12 @@ function showToast(message) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    // Load sample by default
-    loadSample();
+    // Check for template parameter (Programmatic SEO)
+    const template = getUrlParam('example');
+    if (template && TEMPLATES[template]) {
+        loadTemplate(template);
+    } else {
+        // Load sample by default
+        loadSample();
+    }
 });

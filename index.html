@@ -3,8 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Schema Flow - Visual JSON to JSON Schema Converter</title>
-    <meta name="description" content="Convert JSON to JSON Schema with visual tree editor. Supports draft-07, 2019-09, 2020-12.">
+
+    <!-- Primary Meta Tags -->
+    <title>JSON Schema Flow - Free Online JSON to JSON Schema Converter</title>
+    <meta name="title" content="JSON Schema Flow - Free Online JSON to JSON Schema Converter">
+    <meta name="description" content="Convert JSON to JSON Schema instantly. Visual tree editor, TypeScript export, supports draft-04/07/2019-09/2020-12. Free, open-source, runs in browser.">
+    <meta name="keywords" content="JSON schema, JSON converter, JSON schema generator, TypeScript interface, JSON validator, schema draft-07, JSON schema 2020-12, online JSON tool">
+    <meta name="author" content="JSON Schema Flow">
+    <link rel="canonical" href="https://ozxc44.github.io/json-schema-flow/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ozxc44.github.io/json-schema-flow/">
+    <meta property="og:title" content="JSON Schema Flow - Free Online JSON to JSON Schema Converter">
+    <meta property="og:description" content="Convert JSON to JSON Schema instantly. Visual tree editor, TypeScript export, supports all schema versions. Free & open-source.">
+    <meta property="og:image" content="https://ozxc44.github.io/json-schema-flow/og-image.png">
+    <meta property="og:site_name" content="JSON Schema Flow">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ozxc44.github.io/json-schema-flow/">
+    <meta property="twitter:title" content="JSON Schema Flow - Free Online JSON to JSON Schema Converter">
+    <meta property="twitter:description" content="Convert JSON to JSON Schema instantly. Visual tree editor, TypeScript export, supports all schema versions.">
+    <meta property="twitter:image" content="https://ozxc44.github.io/json-schema-flow/og-image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>{}</text></svg>">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "JSON Schema Flow",
+        "description": "Free online JSON to JSON Schema converter with visual tree editor and TypeScript export",
+        "url": "https://ozxc44.github.io/json-schema-flow/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Real-time JSON to JSON Schema conversion",
+            "Visual tree structure preview",
+            "Support for draft-04, draft-07, 2019-09, 2020-12",
+            "TypeScript interface generation",
+            "Privacy-first - runs entirely in browser"
+        ]
+    }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .tree-item { transition: all 0.15s ease; }
@@ -61,6 +111,14 @@
                     </div>
                 </div>
                 <div class="p-4">
+                    <!-- Template Selector -->
+                    <div class="mb-3 flex items-center gap-2 flex-wrap">
+                        <span class="text-xs text-gray-500">Quick templates:</span>
+                        <button onclick="loadTemplate('user')" class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 transition">User Profile</button>
+                        <button onclick="loadTemplate('api')" class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 transition">API Response</button>
+                        <button onclick="loadTemplate('ecommerce')" class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 transition">Product</button>
+                        <button onclick="loadTemplate('config')" class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 transition">Config</button>
+                    </div>
                     <textarea
                         id="jsonInput"
                         class="w-full h-64 p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"

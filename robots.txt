@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ozxc44.github.io/json-schema-flow/sitemap.xml
